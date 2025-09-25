@@ -1,0 +1,52 @@
+# Default configuration for SABR MDA-CNN experiments
+
+name: "sabr_mda_cnn_default"
+description: "Default configuration for SABR volatility surface modeling with MDA-CNN"
+output_dir: "new/results"
+
+# SABR model parameters
+sabr_params:
+  F0: 1.0          # Forward price
+  alpha: 0.2       # Initial volatility
+  beta: 0.5        # Elasticity parameter [0,1]
+  nu: 0.3          # Vol-of-vol parameter
+  rho: -0.3        # Correlation parameter [-1,1]
+
+# Grid configuration for surface discretization
+grid_config:
+  strike_range: [0.5, 2.0]      # Strike range as multiple of F0
+  maturity_range: [0.1, 2.0]    # Maturity range in years
+  n_strikes: 21                 # Number of strike points
+  n_maturities: 11              # Number of maturity points
+
+# Data generation configuration
+data_gen_config:
+  n_parameter_sets: 1000        # Number of SABR parameter combinations
+  mc_paths: 100000              # Monte Carlo simulation paths
+  sampling_strategy: "uniform"  # Parameter sampling strategy
+  hf_budget: 200                # Number of HF points per surface
+  validation_split: 0.15        # Validation data fraction
+  test_split: 0.15              # Test data fraction
+  random_seed: 42               # Random seed for reproducibility
+
+# Model architecture configuration
+model_config:
+  patch_size: [9, 9]            # CNN input patch size
+  cnn_filters: [32, 64, 128]    # CNN filter sizes
+  cnn_kernel_size: 3            # CNN kernel size
+  mlp_hidden_dims: [64, 64]     # MLP hidden dimensions
+  fusion_dims: [128, 64]        # Fusion layer dimensions
+  dropout_rate: 0.2             # Dropout rate
+  activation: "relu"            # Activation function
+
+# Training configuration
+training_config:
+  batch_size: 64                # Training batch size
+  epochs: 200                   # Maximum training epochs
+  learning_rate: 0.0003         # Initial learning rate
+  weight_decay: 0.00001         # L2 regularization
+  early_stopping_patience: 20   # Early stopping patience
+  lr_scheduler_patience: 10     # Learning rate scheduler patience
+  lr_scheduler_factor: 0.5      # Learning rate reduction factor
+  gradient_clip_norm: 1.0       # Gradient clipping norm
+  save_best_only: true          # Save only best model

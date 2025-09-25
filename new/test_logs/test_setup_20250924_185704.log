@@ -1,0 +1,3 @@
+2025-09-24 18:57:04,239 - sabr_mda_cnn - INFO - logging_utils:setup_logging:138 - Logging to file: new\test_logs\test_setup_20250924_185704.log
+2025-09-24 18:57:04,239 - sabr_mda_cnn - INFO - test_setup:test_logging_system:53 - Test info message
+2025-09-24 18:57:04,240 - sabr_mda_cnn - WARNING - test_setup:test_logging_system:54 - Test warning message

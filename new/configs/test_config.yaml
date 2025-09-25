@@ -1,0 +1,52 @@
+# Test configuration for quick experiments and debugging
+
+name: "sabr_mda_cnn_test"
+description: "Small-scale test configuration for debugging and quick experiments"
+output_dir: "new/results/test"
+
+# SABR model parameters
+sabr_params:
+  F0: 1.0
+  alpha: 0.2
+  beta: 0.5
+  nu: 0.3
+  rho: -0.3
+
+# Smaller grid for faster testing
+grid_config:
+  strike_range: [0.7, 1.5]
+  maturity_range: [0.25, 1.0]
+  n_strikes: 11
+  n_maturities: 6
+
+# Reduced data generation for testing
+data_gen_config:
+  n_parameter_sets: 50          # Much smaller for testing
+  mc_paths: 10000               # Fewer MC paths
+  sampling_strategy: "uniform"
+  hf_budget: 20                 # Fewer HF points
+  validation_split: 0.2
+  test_split: 0.2
+  random_seed: 42
+
+# Smaller model for testing
+model_config:
+  patch_size: [5, 5]            # Smaller patches
+  cnn_filters: [16, 32]         # Fewer filters
+  cnn_kernel_size: 3
+  mlp_hidden_dims: [32, 32]     # Smaller MLP
+  fusion_dims: [64, 32]         # Smaller fusion
+  dropout_rate: 0.1
+  activation: "relu"
+
+# Faster training for testing
+training_config:
+  batch_size: 16                # Smaller batches
+  epochs: 50                    # Fewer epochs
+  learning_rate: 0.001          # Higher learning rate
+  weight_decay: 0.00001
+  early_stopping_patience: 10   # Less patience
+  lr_scheduler_patience: 5
+  lr_scheduler_factor: 0.5
+  gradient_clip_norm: 1.0
+  save_best_only: true

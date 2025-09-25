@@ -1,0 +1,53 @@
+data_gen_config:
+  hf_budget: 200
+  mc_paths: 100000
+  n_parameter_sets: 1000
+  random_seed: 42
+  sampling_strategy: uniform
+  test_split: 0.15
+  validation_split: 0.15
+description: ''
+grid_config:
+  maturity_range:
+  - 0.1
+  - 2.0
+  n_maturities: 11
+  n_strikes: 21
+  strike_range:
+  - 0.5
+  - 2.0
+model_config:
+  activation: relu
+  cnn_filters:
+  - 32
+  - 64
+  - 128
+  cnn_kernel_size: 3
+  dropout_rate: 0.2
+  fusion_dims:
+  - 128
+  - 64
+  mlp_hidden_dims:
+  - 64
+  - 64
+  patch_size:
+  - 9
+  - 9
+name: test_experiment
+output_dir: new/results
+sabr_params:
+  F0: 1.0
+  alpha: 0.2
+  beta: 0.5
+  nu: 0.3
+  rho: -0.3
+training_config:
+  batch_size: 64
+  early_stopping_patience: 20
+  epochs: 200
+  gradient_clip_norm: 1.0
+  learning_rate: 0.0003
+  lr_scheduler_factor: 0.5
+  lr_scheduler_patience: 10
+  save_best_only: true
+  weight_decay: 1.0e-05
