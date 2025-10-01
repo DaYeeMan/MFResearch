@@ -1,0 +1,33 @@
+# Evaluation-specific configuration for SABR MDA-CNN
+name: "sabr_evaluation_experiment"
+output_dir: "results/evaluation"
+
+# HF budgets to analyze
+hf_budgets: [25, 50, 100, 200, 400]
+
+# Models to compare
+models:
+  - "mda_cnn"
+  - "residual_mlp"
+  - "direct_mlp"
+
+# Evaluation settings
+evaluation_config:
+  confidence_level: 0.95
+  n_bootstrap: 1000
+  statistical_tests: true
+  
+# Visualization settings
+visualization_config:
+  generate_plots: true
+  interactive_plots: true
+  plot_formats: ["png", "pdf", "html"]
+  figure_size: [12, 8]
+  dpi: 150
+
+# Report settings
+report_config:
+  generate_html: true
+  include_executive_summary: true
+  include_technical_details: true
+  include_statistical_analysis: true

@@ -1,0 +1,48 @@
+# Training-specific configuration for SABR MDA-CNN
+name: "sabr_training_experiment"
+output_dir: "results/training"
+
+# SABR parameter ranges for training data
+sabr_params:
+  forward_range: [90.0, 110.0]
+  alpha_range: [0.2, 0.6]
+  beta_range: [0.5, 0.9]
+  nu_range: [0.2, 0.8]
+  rho_range: [-0.6, 0.6]
+
+# Grid configuration for volatility surfaces
+grid_config:
+  strike_range: [75.0, 125.0]
+  maturity_range: [0.25, 3.0]
+  n_strikes: 20
+  n_maturities: 12
+
+# Data generation settings
+data_gen_config:
+  n_parameter_sets: 500
+  hf_budget: 150
+  mc_paths: 75000
+  validation_split: 0.2
+  test_split: 0.15
+  random_seed: 42
+
+# Model architecture
+model_config:
+  patch_size: [9, 9]
+  cnn_filters: [32, 64, 128]
+  mlp_hidden_dims: [128, 64]
+  fusion_dims: [128, 64]
+  dropout_rate: 0.25
+  activation: "relu"
+
+# Training parameters
+training_config:
+  epochs: 150
+  batch_size: 32
+  learning_rate: 0.0005
+  early_stopping: true
+  early_stopping_patience: 25
+  reduce_lr_on_plateau: true
+  reduce_lr_patience: 10
+  reduce_lr_factor: 0.5
+  min_lr: 0.00001

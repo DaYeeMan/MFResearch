@@ -281,6 +281,106 @@ def create_wing_weight_function(
     return weight_fn
 
 
+def create_moneyness_weight_function(
+    strikes: tf.Tensor,
+    forward_price: float,
+    atm_weight: float = 1.0,
+    wing_weight: float = 2.0,
+    wing_threshold: float = 0.2
+) -> Callable:
+    """
+    Create a weight function based on actual moneyness for volatility surface.
+    
+    Args:
+        strikes: Strike prices tensor
+        forward_price: Forward price for moneyness calculation
+        atm_weight: Weight for at-the-money region
+        wing_weight: Weight for wing regions
+        wing_threshold: Moneyness threshold for wings (e.g., 0.2 = 20% away from ATM)
+        
+    Returns:
+        Weight function that uses actual moneyness
+    """
+    def weight_fn(y_true, y_pred):
+        # Calculate moneyness: log(K/F)
+        moneyness = tf.math.log(strikes / forward_price)
+        abs_moneyness = tf.abs(moneyness)
+        
+        # Higher weights for strikes far from ATM (wings)
+        weights = tf.where(
+            abs_moneyness > wing_threshold,
+            wing_weight,
+            atm_weight
+        )
+        
+        return weights
+    
+    return weight_fn
+
+
+class AdaptiveWeightedMSE(keras.losses.Loss):
+    """
+    Adaptive weighted MSE that adjusts weights based on training progress.
+    
+    Gradually increases emphasis on wings as training progresses.
+    """
+    
+    def __init__(
+        self,
+        initial_wing_weight: float = 1.0,
+        final_wing_weight: float = 3.0,
+        atm_weight: float = 1.0,
+        wing_threshold: float = 0.1,
+        adaptation_epochs: int = 50,
+        name: str = 'adaptive_weighted_mse',
+        **kwargs
+    ):
+        super().__init__(name=name, **kwargs)
+        self.initial_wing_weight = initial_wing_weight
+        self.final_wing_weight = final_wing_weight
+        self.atm_weight = atm_weight
+        self.wing_threshold = wing_threshold
+        self.adaptation_epochs = adaptation_epochs
+        self.current_epoch = tf.Variable(0, trainable=False, dtype=tf.int32)
+    
+    def call(self, y_true, y_pred):
+        """
+        Compute adaptive weighted MSE loss.
+        
+        Args:
+            y_true: True residual values
+            y_pred: Predicted residual values
+            
+        Returns:
+            Adaptive weighted MSE loss
+        """
+        mse = tf.square(y_true - y_pred)
+        
+        # Calculate current wing weight based on training progress
+        progress = tf.cast(self.current_epoch, tf.float32) / self.adaptation_epochs
+        progress = tf.clip_by_value(progress, 0.0, 1.0)
+        
+        current_wing_weight = (
+            self.initial_wing_weight + 
+            progress * (self.final_wing_weight - self.initial_wing_weight)
+        )
+        
+        # Apply weights
+        abs_residual = tf.abs(y_true)
+        weights = tf.where(
+            abs_residual > self.wing_threshold,
+            current_wing_weight,
+            self.atm_weight
+        )
+        
+        weighted_mse = mse * weights
+        return tf.reduce_mean(weighted_mse)
+    
+    def update_epoch(self, epoch: int):
+        """Update current epoch for adaptive weighting."""
+        self.current_epoch.assign(epoch)
+
+
 def get_loss_function(loss_name: str, **kwargs) -> keras.losses.Loss:
     """
     Factory function to create loss functions.
